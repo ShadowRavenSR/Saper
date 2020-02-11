@@ -4,13 +4,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.io.PipedOutputStream;
 import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class Saper implements ActionListener, MouseListener {
-    //Dane
     private IconyPrzyciskow icons = new IconyPrzyciskow();
 
     private int poczRzedy = 8;
@@ -34,7 +32,6 @@ public class Saper implements ActionListener, MouseListener {
     private Timer timer;
     private PlanszaGry mapaMin;
 
-    //Graficzne
     private PojedynczyPrzycisk[][] przyciski;
     private JFrame oknoGry = new JFrame("Saper");
     private JMenuBar menuGorne = new JMenuBar();
@@ -88,8 +85,8 @@ public class Saper implements ActionListener, MouseListener {
 
         oknoGry.setJMenuBar(menuGorne);
 
-        twarz.setMaximumSize(new Dimension(26, 27));
-        twarz.setPreferredSize(new Dimension(26, 27));
+        twarz.setMaximumSize(new Dimension(39, 40));
+        twarz.setPreferredSize(new Dimension(39, 40));
         twarz.addMouseListener(this);
         twarz.setPressedIcon(icons.zwrocIkoneTwarzy(1));
 
@@ -105,7 +102,7 @@ public class Saper implements ActionListener, MouseListener {
         panelKomponentow.setLayout(new BoxLayout(panelKomponentow, BoxLayout.Y_AXIS));
 
         oknoGry.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        oknoGry.setResizable(false);
+        oknoGry.setResizable(true);
         oknoGry.setVisible(true);
     }
 
@@ -130,8 +127,8 @@ public class Saper implements ActionListener, MouseListener {
             for (int j = 0; j < maxKolumn; j++) {
                 przyciski[i][j] = new PojedynczyPrzycisk(i, j, icons.zwrocStatusFlagi(0));
                 przyciski[i][j].addMouseListener(this);
-                przyciski[i][j].setMaximumSize(new Dimension(20, 20));
-                przyciski[i][j].setPreferredSize(new Dimension(20, 20));
+                przyciski[i][j].setMaximumSize(new Dimension(30, 30));
+                przyciski[i][j].setPreferredSize(new Dimension(30, 30));
 
                 GridBagConstraints GBC = new GridBagConstraints();
                 GBC.gridx = j;
@@ -186,11 +183,19 @@ public class Saper implements ActionListener, MouseListener {
         }
         przyciski[r][k].setKlikniety(true);
         if (mapaMin.getWartoscPola(r, k) == 0) {
-            int gornaGranica = r - 1 < 0 ? 0 : r - 1;
-            int dolnaGranica = r + 1 < maxRzedow ? r + 1 : maxRzedow - 1;
-            int lewaGranica = k - 1 < 0 ? 0 : k - 1;
-            int prawaGranica = k + 1 < maxKolumn ? k + 1 : maxKolumn - 1;
-            int tmp = 0;
+            if (!przyciski[r][k].getKlikniety()) return;
+            int gornaGranica;
+            if (r - 1 < 0) gornaGranica = 0;
+            else gornaGranica = r - 1;
+            int dolnaGranica;
+            if (r + 1 < maxRzedow) dolnaGranica = r + 1;
+            else dolnaGranica = maxRzedow - 1;
+            int lewaGranica;
+            if (k - 1 < 0) lewaGranica = 0;
+            else lewaGranica = k - 1;
+            int prawaGranica;
+            if (k + 1 < maxKolumn) prawaGranica = k + 1;
+            else prawaGranica = maxKolumn - 1;
             for (int i = gornaGranica; i <= dolnaGranica; i++) {
                 for (int j = lewaGranica; j <= prawaGranica; j++) {
                     odkryjPole(i, j);
@@ -201,10 +206,18 @@ public class Saper implements ActionListener, MouseListener {
 
     public void odkryjDookola(int r, int k) {
         if (!przyciski[r][k].getKlikniety()) return;
-        int gornaGranica = r - 1 < 0 ? 0 : r - 1;
-        int dolnaGranica = r + 1 < maxRzedow ? r + 1 : maxRzedow - 1;
-        int lewaGranica = k - 1 < 0 ? 0 : k - 1;
-        int prawaGranica = k + 1 < maxKolumn ? k + 1 : maxKolumn - 1;
+        int gornaGranica;
+        if (r - 1 < 0) gornaGranica = 0;
+        else gornaGranica = r - 1;
+        int dolnaGranica;
+        if (r + 1 < maxRzedow) dolnaGranica = r + 1;
+        else dolnaGranica = maxRzedow - 1;
+        int lewaGranica;
+        if (k - 1 < 0) lewaGranica = 0;
+        else lewaGranica = k - 1;
+        int prawaGranica;
+        if (k + 1 < maxKolumn) prawaGranica = k + 1;
+        else prawaGranica = maxKolumn - 1;
         int tmp = 0;
         for (int i = gornaGranica; i <= dolnaGranica; i++) {
             for (int j = lewaGranica; j <= prawaGranica; j++) {
@@ -303,22 +316,16 @@ public class Saper implements ActionListener, MouseListener {
         int kolumna = ((PojedynczyPrzycisk) e.getSource()).getKolumna();
         if(!rozpoczete&&e.getButton()== MouseEvent.BUTTON1) startGry(rzad,kolumna);
 
-        Timer timer=new Timer();
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                if(e.getButton() == MouseEvent.BUTTON1) {
-                    odkryjPole(rzad, kolumna);
-                    if(warunkiWygranej()) wygrana();
-                    if(warunkiPrzegranej()) przegrana();
-                }else if(e.getButton() == MouseEvent.BUTTON3) {
-                    oflaguj(rzad, kolumna);
-                }else if(e.getButton()==MouseEvent.BUTTON2){
-                    odkryjDookola(rzad,kolumna);
-                }
-                this.cancel();
-            }
-        },new Date(),10);
+
+        if(e.getButton() == MouseEvent.BUTTON1) {
+            odkryjPole(rzad, kolumna);
+            if(warunkiWygranej()) wygrana();
+            if(warunkiPrzegranej()) przegrana();
+        }else if(e.getButton() == MouseEvent.BUTTON3) {
+            oflaguj(rzad, kolumna);
+        }else if(e.getButton()==MouseEvent.BUTTON2) {
+            odkryjDookola(rzad, kolumna);
+        }
     }
 
 

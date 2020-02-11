@@ -5,7 +5,7 @@ public class PlanszaGry {
     private int liczbaKolumn;
     private int liczbaRzedow;
     private int liczbaMin;
-    private int[][] wartoscPola;//0-9, gdzie 9 oznacza mine
+    private int[][] wartoscPola;
 
     public PlanszaGry(int r, int k, int m, int sr, int sk) {
         liczbaKolumn = k;
@@ -20,7 +20,7 @@ public class PlanszaGry {
         return wartoscPola[r][k];
     }
 
-    public void przydzielMiny(int k, int r) {
+    public void przydzielMiny(int r, int k) {
         int tmp = 0;
         Random rand = new Random();
         while (tmp < liczbaMin) {
@@ -33,10 +33,18 @@ public class PlanszaGry {
     }
 
     public int sprawdzPrzyleglePola(int r, int k) {
-        int gornaGranica=r - 1 < 0?0: r-1;
-        int dolnaGranica = r + 1<liczbaRzedow?r+1:liczbaRzedow-1;
-        int lewaGranica=k-1<0?0:k-1;
-        int prawaGranica=k+1<liczbaKolumn?k+1:liczbaKolumn-1;
+        int gornaGranica;
+        if (r - 1 < 0) gornaGranica = 0;
+        else gornaGranica = r - 1;
+        int dolnaGranica;
+        if (r + 1 < liczbaRzedow) dolnaGranica = r + 1;
+        else dolnaGranica = liczbaRzedow - 1;
+        int lewaGranica;
+        if (k - 1 < 0) lewaGranica = 0;
+        else lewaGranica = k - 1;
+        int prawaGranica;
+        if (k + 1 < liczbaKolumn) prawaGranica = k + 1;
+        else prawaGranica = liczbaKolumn - 1;
         int tmp = 0;
         for (int i = gornaGranica; i <= dolnaGranica; i++) {
             for (int j = lewaGranica; j <= prawaGranica; j++) {
